@@ -6,6 +6,7 @@ env:
   - PKG_RELEASE=$(python ${DIST_REPO}/scripts/get-version-release.py --release)
   - PKG_RELEASE_EL7=${DIST_REPO}/rpms/f5-openstack-lbaasv2-driver-${PKG_VERSION}-1.el7.noarch.rpm
   - PKG_RELEASE_1404=${DIST_REPO}/deb_dist/python-f5-openstack-lbaasv2-driver_${PKG_VERSION}-${PKG_RELEASE}_1404_all.deb
+  - RELEASE_TAG="v$(echo $PKG_VERSION |cut -c1-3)"
 services:
 - docker
 language: python
@@ -61,24 +62,23 @@ deploy:
       all_branches: true
       tags: true
       python: 2.7
-    skip_cleanup: true
+    skip_cleanup: true  
   # deploy docs to s3
-  # if this is not a tagged release, the docs will deploy to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH/
+  # if this is not a tagged release, the docs go to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH
   - provider: script
     skip_cleanup: true
     on:
-      branch: liberty
+      all_branches: true
       repo: F5Networks/f5-openstack-lbaasv2-driver
+      branch: stable/mitaka
       condition: $TRAVIS_TAG = ""
     script:
-    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver $TRAVIS_BRANCH
-   # if this is a tagged release, the docs go to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH/vX.Y
+    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver mitaka
+  # if this is a tagged release, the docs go to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH/vX.Y
   - provider: script
     skip_cleanup: true
-    env:
-    - RELEASE_TAG="$(echo $TRAVIS_TAG |cut -c1-4)"
     on:
-      tags: true
+      all_branches: true
       repo: F5Networks/f5-openstack-lbaasv2-driver
     script:
-    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver/$TRAVIS_BRANCH $RELEASE_TAG
+    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver/mitaka $RELEASE_TAG
