@@ -64,21 +64,17 @@ deploy:
       python: 2.7
     skip_cleanup: true  
   # deploy docs to s3
-  # if this is not a tagged release, the docs go to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH
-  - provider: script
-    skip_cleanup: true
-    on:
-      all_branches: true
-      repo: F5Networks/f5-openstack-lbaasv2-driver
-      branch: liberty
-      condition: $TRAVIS_TAG = ""
-    script:
-    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver liberty
-  # if this is a tagged release, the docs go to /products/openstack/lbaasv2-driver/$TRAVIS_BRANCH/vX.Y
   - provider: script
     skip_cleanup: true
     on:
       all_branches: true
       repo: F5Networks/f5-openstack-lbaasv2-driver
     script:
-    - ./docs/scripts/deploy-docs.sh aws s3 rm $AWS_S3_BUCKET/products/openstack/lbaasv2-driver/mitaka/v8.3 --recursive
+    - ./docs/scripts/deploy-docs.sh publish-product-docs-to-prod openstack/lbaasv2-driver/liberty $RELEASE_TAG
+  - provider: script
+    skip_cleanup: true
+    on:
+      all_branches: true
+      repo: F5Networks/f5-openstack-lbaasv2-driver
+    script:
+    - ./docs/scripts/deploy-docs.sh aws s3 rm s3://$AWS_S3_BUCKET/products/openstack/lbaasv2-driver/mitaka/v8.3 --recursive
